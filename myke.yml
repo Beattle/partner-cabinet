@@ -1,0 +1,38 @@
+project: "partner-cabinet"
+title: "Наложка: Сервис кабинета партнёра"
+env:
+  builddir: .
+  resultsdir: ./build
+  tarfile: ./build/build.tar
+tasks:
+  clear:
+    title: Очистка сборочной директории
+    cmd: |
+      mkdir -p ${resultsdir} >/dev/null
+      rm -rf ${resultsdir}/* ${resultsdir}/.??* ${builddir}/var/cache/* ${builddir}/tests/_output/*
+
+  composer:
+    title: Обновление зависимостей composer
+    cmd: |
+      APP_ENV=prod DATABASE_SERVER_VERSION=${DATABASE_SERVER_VERSION} composer install --no-ansi --prefer-dist
+      composer dump-env prod
+      APP_ENV=prod DATABASE_SERVER_VERSION=${DATABASE_SERVER_VERSION} composer install --no-ansi --no-dev --prefer-dist --classmap-authoritative
+
+  analyze:
+    title: Запуск статического анализатора PHP StAn
+    cmd: phpstan analyse -l0 --no-progress --error-format=raw src
+
+  build:
+    title: Сборка проекта
+    before: $myke clear && $myke composer && $myke analyze
+    cmd: |
+      tar cf ${tarfile} \
+          --add-file=${builddir}/.env.local.php \
+          --no-wildcards-match-slash \
+          --exclude="${resultsdir}" \
+          --exclude="${builddir}/*.*" \
+          --exclude="${builddir}/remoting" \
+          --exclude="tests" \
+          --exclude="Tests" \
+          --exclude="Resources/public" \
+       "${builddir}"
