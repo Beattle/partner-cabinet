@@ -1,0 +1,3 @@
+api_data:
+  structures:
+    - { namespace: App\Entity, path: '%kernel.project_dir%/src/Entity' }
