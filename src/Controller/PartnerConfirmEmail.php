@@ -4,10 +4,10 @@ namespace App\Controller;
 
 use App\Entity\Partner;
 use App\Repository\PartnerRepository;
-use Nalogka\ApiExceptions\Response\NotFoundError;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -49,7 +49,7 @@ class PartnerConfirmEmail extends AbstractController
     {
         $token = $request->request->get('email_confirm_token');
         if (empty($token)) {
-            throw new NotFoundError('Не указан токен для подтверждения email');
+            throw new NotFoundHttpException('Не указан токен для подтверждения email');
         }
         $partner = $this->confirmEmail($token);
         if ($partner) {
@@ -84,7 +84,7 @@ class PartnerConfirmEmail extends AbstractController
         $partner = $this->partnerRepository->findPartnerByEmailConfirmationToken($token);
 
         if (!$partner) {
-            throw new NotFoundError('Не найден пользователь для данного токена');
+            throw new NotFoundHttpException('Не найден пользователь для данного токена');
         }
         $partner->emailConfirmationToken = null;
         $partner->emailConfirmed = true;

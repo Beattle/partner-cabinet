@@ -1,0 +1,19 @@
+actor: BackendTester
+modules:
+    enabled:
+        - Symfony:
+            app_path: 'src'
+            environment: 'test'
+            cache_router: false
+            debug: true
+        - REST:
+            depends: Symfony
+        - App\Tests\Helper\Faker:
+            lang: ru_RU
+        - Nalogka\Codeception\Database\DataCreation:
+            depends: [ Symfony ]
+            cleanup: true # All doctrine queries will be wrapped in a transaction, which will be rolled back at the end of each test
+        - App\Tests\Helper\DataCreation\Common:
+            depends: [ Nalogka\Codeception\Database\DataCreation, App\Tests\Helper\Faker ]
+        - App\Tests\Helper\DataCreation\Partner:
+              depends: [ Nalogka\Codeception\Database\DataCreation, App\Tests\Helper\Faker ]

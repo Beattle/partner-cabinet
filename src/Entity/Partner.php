@@ -76,6 +76,7 @@ class Partner implements UserInterface
      * @var string
      * @ORM\Column(type="string", length=255, nullable=true)
      * @SWG\Property(example="Моргунов")
+     * @Assert\NotBlank()
      * @SerializeGroup({"partner_set" ,"partner_get"})
      */
     public $lastname;
@@ -121,11 +122,6 @@ class Partner implements UserInterface
      * @ORM\Column(type="string")
      */
     public $passwordHash;
-
-    public function __construct($email)
-    {
-        $this->email = $email;
-    }
 
     /**
      * @ORM\PrePersist

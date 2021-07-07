@@ -1,0 +1,42 @@
+project: "partner-cabinet-tests"
+title: "Наложка: Кабинет Партнера. Тесты"
+env_files:
+  - .env.test
+env:
+  builddir: .
+tasks:
+  test-composer-install:
+    title: Обновление разработческих зависимостей composer для тестов
+    cmd: composer install --no-ansi --dev --prefer-dist --classmap-authoritative
+
+  test-database-create:
+    title: Создание тестовой БД
+    before: $myke test-composer-install
+    cmd: php bin/console doctrine:database:create --no-ansi --if-not-exists --no-interaction
+
+  test-database-init:
+    title: Инициализация тестовой БД
+    before: $myke test-database-create
+    cmd: php bin/console doctrine:migrations:migrate --no-ansi --no-interaction
+
+  test-cleanup:
+    title: Очистка после запуска автоматизированных тестов
+    cmd: |
+      php bin/console doctrine:database:drop --no-ansi --if-exists --no-interaction --force
+      rm -rf ${builddir}/var/cache/test ${builddir}/var/log;
+
+  test-prepare:
+    title: Подготовка к запуску автоматизированных тестов
+    cmd: "[ -f .env.test.local ] || cp .env.test .env.test.local"
+    after: $myke test-composer-install && $myke test-database-init && vendor/bin/codecept build
+
+  test:
+    title: Запуск автоматизированных тестов
+    before: $myke test-prepare
+    cmd: vendor/bin/codecept run --no-ansi {{.args}}
+
+  test-report:
+    title: Запуск автоматизированных тестов с файлами отчётов и последующей очисткой
+    cmd: $myke test --args="--html --xml"
+    after: $myke test-cleanup
+    error: $myke test-cleanup
