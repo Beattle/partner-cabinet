@@ -4,6 +4,8 @@ env:
   builddir: .
   resultsdir: ./build
   tarfile: ./build/build.tar
+discover:
+  - myke-test.yml
 tasks:
   clear:
     title: Очистка сборочной директории
