@@ -10,6 +10,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups as SerializeGroup;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * @ORM\Entity
@@ -39,7 +40,7 @@ class Partner implements UserInterface
      * @ORM\Column(type="string", length=255, nullable=true, unique=true)
      * @Assert\Email()
      * @Assert\NotBlank()
-     * @SerializeGroup({"partner_set" ,"partner_get"})
+     * @SerializeGroup({"partner_set", "partner_get"})
      */
     public $email;
 
@@ -48,7 +49,7 @@ class Partner implements UserInterface
      * @var string|null
      * @ORM\Column(type="string", length=30, nullable=true, unique=true)
      * @SWG\Property(example="79167231100")
-     * @SerializeGroup({"partner_set" ,"partner_get"})
+     * @SerializeGroup({"partner_set" ,"partner_get", "partner_update"})
      */
     public $phone;
 
@@ -58,7 +59,7 @@ class Partner implements UserInterface
      * @ORM\Column(type="string", length=255, nullable=true)
      * @SWG\Property(example="Иван")
      * @Assert\NotBlank()
-     * @SerializeGroup({"partner_set" ,"partner_get"})
+     * @SerializeGroup({"partner_set", "partner_get", "partner_update"})
      */
     public $firstname;
 
@@ -67,7 +68,7 @@ class Partner implements UserInterface
      * @var string
      * @ORM\Column(type="string", length=255, nullable=true)
      * @SWG\Property(example="Васильевич")
-     * @SerializeGroup({"partner_set" ,"partner_get"})
+     * @SerializeGroup({"partner_set", "partner_get", "partner_update"})
      */
     public $middlename;
 
@@ -77,15 +78,20 @@ class Partner implements UserInterface
      * @ORM\Column(type="string", length=255, nullable=true)
      * @SWG\Property(example="Моргунов")
      * @Assert\NotBlank()
-     * @SerializeGroup({"partner_set" ,"partner_get"})
+     * @SerializeGroup({"partner_set", "partner_get", "partner_update"})
      */
     public $lastname;
 
     /**
      * Текстовый пароль пользователя
      * @Assert\NotBlank()
-     * @Assert\Length(min=6, max=4096, minMessage="Пароль должен состоять как минимум из 6 символов.")
-     * @SerializeGroup({"partner_set"})
+     * @Assert\Length(
+     *     min=6,
+     *     max=4096,
+     *     minMessage="Пароль должен состоять как минимум из 6 символов.",
+     *     groups={"Default", "update"}
+     * )
+     * @SerializeGroup({"partner_set", "partner_update"})
      */
     public $password = null;
 
@@ -208,5 +214,18 @@ class Partner implements UserInterface
     public function getPassword(): ?string
     {
         return $this->passwordHash;
+    }
+
+    /**
+     * @Assert\Callback(groups={"update"})
+     * @param ExecutionContextInterface $context
+     */
+    public function validateBeforeUpdate(ExecutionContextInterface $context)
+    {
+        if (empty(array_filter(get_object_vars($this)))) {
+            $context->buildViolation('Не указаны данные для обновления')
+                ->atPath('data')
+                ->addViolation();
+        }
     }
 }
