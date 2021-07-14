@@ -46,8 +46,8 @@ class Partner extends AbstractBase implements DataCreatorModuleInterface
         $partnerID = mb_substr(crc32($name), 0, 8);
         $partner = new EntityPartner();
         $partner->id = $partnerID;
-        $partner->email = $email ?? $this->faker->email;
-        $partner->phone = $phone ?? $this->faker->e164PhoneNumber;
+        $partner->email = $email ?: $this->faker->email;
+        $partner->phone = $phone ?: $this->faker->e164PhoneNumber;
         $partner->firstname = $this->faker->firstName;
         $partner->lastname = $this->faker->lastName;
         $partner->middlename = $this->faker->word();
