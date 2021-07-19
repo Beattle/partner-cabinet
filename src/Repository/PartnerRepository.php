@@ -13,14 +13,4 @@ class PartnerRepository extends ServiceEntityRepository
         parent::__construct($registry, Partner::class);
     }
 
-    /**
-     * @param $token
-     * @return Partner|object|null
-     */
-    public function findPartnerByEmailConfirmationToken($token)
-    {
-        $partner = $this->findOneBy(['emailConfirmationToken' => $token]);
-
-        return $partner ?? null;
-    }
 }

@@ -26,4 +26,12 @@ class SecurityController extends AbstractController
         return $this->json($user, 200, [], [AbstractNormalizer::GROUPS => self::SERIALIZATION_GROUPS]);
     }
 
+    /**
+     * @Route("/partners/logout", name="partner_logout", methods={"GET"})
+     */
+    public function logout(): void
+    {
+
+    }
+
 }

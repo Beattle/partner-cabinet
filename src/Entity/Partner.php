@@ -84,16 +84,25 @@ class Partner implements UserInterface
 
     /**
      * Текстовый пароль пользователя
-     * @Assert\NotBlank()
+     * @Assert\NotBlank(groups={"Default", "password_confirm"})
      * @Assert\Length(
      *     min=6,
      *     max=4096,
      *     minMessage="Пароль должен состоять как минимум из 6 символов.",
-     *     groups={"Default", "update"}
+     *     groups={"Default", "update", "password_confirm"}
      * )
      * @SerializeGroup({"partner_set", "partner_update"})
      */
     public $password = null;
+
+    /**
+     * Токен для сброса пароля партнера
+     * @var string
+     * @Assert\NotBlank(groups="password_confirm")
+     * @SerializeGroup({"partner_password_confirm"})
+     * @ORM\Column(type="string", length=64, nullable=true)
+     */
+    public $passwordResetToken;
 
     /**
      * @var DateTimeImmutable Дата и время создания партнёра

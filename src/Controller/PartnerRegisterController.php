@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Partner;
-use App\Repository\PartnerRepository;
 use App\Service\EmailService;
 use App\Traits\ValidatorTrait;
 use Nalogka\UniqueStringGenerator\Generator;
@@ -37,11 +36,6 @@ class PartnerRegisterController extends AbstractController
      * @var string
      */
     private $cabinetFrontUrl;
-
-    /**
-     * @var PartnerRepository
-     */
-    private $partnerRepository;
 
     /**
      * @var UserPasswordEncoderInterface

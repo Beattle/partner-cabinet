@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Partner;
-use App\Repository\PartnerRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,19 +24,13 @@ class PartnerConfirmEmail extends AbstractController
      */
     private $tokenStorage;
 
-    /**
-     * @var PartnerRepository
-     */
-    private $partnerRepository;
 
     public function __construct(
         AuthenticationManagerInterface $authenticationManager,
-        TokenStorageInterface $tokenStorage,
-        PartnerRepository $partnerRepository
+        TokenStorageInterface $tokenStorage
     ) {
         $this->authenticationManager = $authenticationManager;
         $this->tokenStorage = $tokenStorage;
-        $this->partnerRepository = $partnerRepository;
     }
 
     /**
@@ -81,8 +74,9 @@ class PartnerConfirmEmail extends AbstractController
      */
     private function confirmEmail(string $token): Partner
     {
-        $partner = $this->partnerRepository->findPartnerByEmailConfirmationToken($token);
-
+        $partner = $this->getDoctrine()->getRepository(Partner::class)->findOneBy(
+            ['emailConfirmationToken' => $token]
+        );
         if (!$partner) {
             throw new NotFoundHttpException('Не найден пользователь для данного токена');
         }
